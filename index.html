@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Tracker — GitHub Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --orange: #db6d28;
+    --purple: #bc8cff;
+    --pink: #f778ba;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 16px 24px; }
+
+  /* Header */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+  }
+  header h1 { font-size: 20px; font-weight: 600; }
+  header h1 span { color: var(--text-muted); font-weight: 400; }
+  .header-controls { display: flex; gap: 12px; align-items: center; }
+  .refresh-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .refresh-btn:hover { border-color: var(--accent); }
+  .refresh-btn.loading { opacity: 0.6; pointer-events: none; }
+  .last-updated { font-size: 12px; color: var(--text-muted); }
+
+  /* Setup */
+  .setup {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px; max-width: 500px; margin: 80px auto;
+  }
+  .setup h2 { margin-bottom: 12px; font-size: 16px; }
+  .setup p { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+  .setup input {
+    width: 100%; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 14px; margin-bottom: 12px;
+  }
+  .setup button {
+    background: var(--green); color: #fff; border: none; padding: 8px 20px;
+    border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 20px; flex: 1; min-width: 140px;
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 2px; }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.red { color: var(--red); }
+  .stat-card .value.yellow { color: var(--yellow); }
+  .stat-card .value.accent { color: var(--accent); }
+
+  /* Section */
+  .section { margin-bottom: 32px; }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .section-header .count {
+    background: var(--border); color: var(--text-muted); font-size: 12px;
+    padding: 1px 8px; border-radius: 10px; font-weight: 500;
+  }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;
+  }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .filter-btn:hover { border-color: var(--text-muted); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 10px 16px; font-size: 12px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(88, 166, 255, 0.04); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Pills */
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    font-size: 11px; font-weight: 500; line-height: 1.5;
+  }
+  .pill-bug { background: #f8514922; color: var(--red); }
+  .pill-enhancement { background: #58a6ff22; color: var(--accent); }
+  .pill-claimed { background: #3fb95022; color: var(--green); }
+  .pill-question { background: #bc8cff22; color: var(--purple); }
+  .pill-needs-clarification { background: #d2992222; color: var(--yellow); }
+  .pill-other { background: #8b949e22; color: var(--text-muted); }
+
+  /* Claude status */
+  .claude-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;
+  }
+  .claude-pass { background: #3fb95022; color: var(--green); }
+  .claude-fail { background: #f8514922; color: var(--red); }
+  .claude-pending { background: #d2992222; color: var(--yellow); }
+  .claude-skipped { background: #8b949e22; color: var(--text-muted); }
+  .claude-triaged { background: #bc8cff22; color: var(--purple); }
+  .claude-icon { font-size: 13px; }
+
+  /* Review decision */
+  .review-approved { color: var(--green); }
+  .review-changes { color: var(--red); }
+  .review-pending { color: var(--text-muted); }
+
+  /* CI */
+  .ci-pass { color: var(--green); }
+  .ci-fail { color: var(--red); }
+  .ci-pending { color: var(--yellow); }
+
+  /* Activity feed */
+  .activity-list { list-style: none; }
+  .activity-item {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px; font-size: 13px;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .activity-time { color: var(--text-muted); font-size: 11px; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+
+  /* Loading */
+  .loading-msg {
+    text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px;
+  }
+  .error-msg { color: var(--red); padding: 16px; text-align: center; }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Author avatar */
+  .author-cell { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats-bar { flex-direction: column; }
+    .stat-card { min-width: unset; }
+    table { font-size: 12px; }
+    th, td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <!-- Setup screen -->
+  <div class="setup" id="setup-screen" style="display:none">
+    <h2>🔧 Dashboard Setup</h2>
+    <p>Enter a GitHub personal access token with <code>repo</code> scope to fetch data from <strong>red-hat-data-services/rhai-org-pulse</strong>.</p>
+    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
+    <p style="margin-bottom:8px">Repo (owner/name):</p>
+    <input type="text" id="repo-input" value="red-hat-data-services/rhai-org-pulse" />
+    <button onclick="saveSetup()">Connect</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" style="display:none">
+    <header>
+      <h1>📋 Team Tracker <span>GitHub Dashboard</span></h1>
+      <div class="header-controls">
+        <span class="last-updated" id="last-updated"></span>
+        <button class="refresh-btn" onclick="refresh()" id="refresh-btn">
+          <span>↻</span> Refresh
+        </button>
+        <button class="refresh-btn" onclick="logout()" style="font-size:12px">⚙️</button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Issues -->
+    <div class="section" id="issues-section">
+      <div class="section-header">
+        <h2>Issues <span class="count" id="issues-count">0</span></h2>
+        <div class="filters" id="issues-filters"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Labels</th>
+              <th>Claude</th>
+              <th>Age</th>
+            </tr>
+          </thead>
+          <tbody id="issues-body">
+            <tr><td colspan="6" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pull Requests -->
+    <div class="section" id="prs-section">
+      <div class="section-header">
+        <h2>Pull Requests <span class="count" id="prs-count">0</span></h2>
+        <div class="filters" id="prs-filters"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>CI</th>
+              <th>Claude Review</th>
+              <th>Review</th>
+              <th>Age</th>
+            </tr>
+          </thead>
+          <tbody id="prs-body">
+            <tr><td colspan="7" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Claude Activity -->
+    <div class="section">
+      <div class="section-header">
+        <h2>🤖 Claude Activity <span class="count" id="activity-count">0</span></h2>
+      </div>
+      <div class="table-wrap">
+        <ul class="activity-list" id="activity-list">
+          <li class="activity-item loading-msg"><div class="spinner"></div> Loading…</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLAUDE_BOTS = [
+  'github-actions[bot]',
+  'claude-issue-assistant[bot]',
+  'anthropic-claude[bot]',
+  'claude[bot]',
+];
+const REPO_KEY = 'tt-dash-repo';
+const TOKEN_KEY = 'tt-dash-token';
+const REFRESH_MS = 5 * 60 * 1000;
+
+let state = { issues: [], prs: [], activity: [], issueFilter: 'all', prFilter: 'all' };
+let refreshTimer = null;
+
+// ---------- Setup ----------
+function init() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const repo = localStorage.getItem(REPO_KEY);
+  if (token && repo) {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    refresh();
+    refreshTimer = setInterval(refresh, REFRESH_MS);
+  } else {
+    document.getElementById('setup-screen').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+}
+
+function saveSetup() {
+  const token = document.getElementById('token-input').value.trim();
+  const repo = document.getElementById('repo-input').value.trim();
+  if (!token || !repo) return;
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(REPO_KEY, repo);
+  init();
+}
+
+function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  clearInterval(refreshTimer);
+  init();
+}
+
+// ---------- API ----------
+async function ghFetch(path) {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const repo = localStorage.getItem(REPO_KEY);
+  const resp = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!resp.ok) throw new Error(`GitHub API ${resp.status}: ${resp.statusText}`);
+  return resp.json();
+}
+
+async function ghFetchAll(path, maxPages = 5) {
+  let results = [];
+  let page = 1;
+  while (page <= maxPages) {
+    const sep = path.includes('?') ? '&' : '?';
+    const data = await ghFetch(`${path}${sep}per_page=100&page=${page}`);
+    if (!Array.isArray(data) || data.length === 0) break;
+    results = results.concat(data);
+    if (data.length < 100) break;
+    page++;
+  }
+  return results;
+}
+
+// ---------- Data fetching ----------
+async function fetchIssues() {
+  const issues = await ghFetchAll('/issues?state=open&sort=updated&direction=desc');
+  // /issues also returns PRs — filter them out
+  return issues.filter(i => !i.pull_request);
+}
+
+async function fetchPRs() {
+  return ghFetchAll('/pulls?state=open&sort=updated&direction=desc');
+}
+
+async function fetchIssueComments(issueNum) {
+  return ghFetchAll(`/issues/${issueNum}/comments`);
+}
+
+async function fetchPRChecks(prNum) {
+  try {
+    // Get check runs for the PR's head SHA
+    const pr = state.prs.find(p => p.number === prNum);
+    if (!pr) return [];
+    const data = await ghFetch(`/commits/${pr.head.sha}/check-runs?per_page=100`);
+    return data.check_runs || [];
+  } catch { return []; }
+}
+
+async function fetchReviews(prNum) {
+  try {
+    return await ghFetchAll(`/pulls/${prNum}/reviews`);
+  } catch { return []; }
+}
+
+// ---------- Claude detection ----------
+function isClaudeBot(login) {
+  return CLAUDE_BOTS.some(b => login.toLowerCase() === b.toLowerCase()) ||
+         login.toLowerCase().includes('claude');
+}
+
+function getClaudeReviewStatus(checks) {
+  const claudeChecks = checks.filter(c =>
+    c.name === 'Claude Review' || c.name === 'Claude Review (Fork)'
+  );
+  if (claudeChecks.length === 0) return { status: 'none', label: '—' };
+
+  // Find the substantive (non-skipped) ones
+  const substantive = claudeChecks.filter(c => c.conclusion !== 'skipped' && c.conclusion !== null);
+  if (substantive.length === 0) {
+    const pending = claudeChecks.filter(c => c.status !== 'completed');
+    if (pending.length > 0) return { status: 'pending', label: 'Pending' };
+    return { status: 'skipped', label: 'Skipped' };
+  }
+
+  // Check output for PASS/FAIL verdict
+  for (const check of substantive) {
+    const text = (check.output?.text || '') + (check.output?.summary || '');
+    if (/\"verdict\"\s*:\s*\"FAIL\"/i.test(text) || /verdict.*FAIL/i.test(text)) {
+      return { status: 'fail', label: 'FAIL' };
+    }
+  }
+
+  // If all succeeded
+  const allSuccess = substantive.every(c => c.conclusion === 'success');
+  if (allSuccess) return { status: 'pass', label: 'PASS' };
+
+  const anyFail = substantive.some(c => c.conclusion === 'failure');
+  if (anyFail) return { status: 'fail', label: 'FAIL' };
+
+  return { status: 'pending', label: 'Running' };
+}
+
+function getCIStatus(checks) {
+  const ciCheck = checks.find(c => c.name === 'Test & Build');
+  if (!ciCheck) return { status: 'none', label: '—' };
+  if (ciCheck.status !== 'completed') return { status: 'pending', label: 'Running' };
+  if (ciCheck.conclusion === 'success') return { status: 'pass', label: 'Pass' };
+  return { status: 'fail', label: 'Fail' };
+}
+
+function getReviewDecision(reviews) {
+  if (!reviews || reviews.length === 0) return { status: 'pending', label: 'Pending' };
+
+  // Get latest review per user (excluding bots)
+  const latestByUser = {};
+  for (const r of reviews) {
+    if (isClaudeBot(r.user.login)) continue;
+    if (r.state === 'COMMENTED') continue;
+    latestByUser[r.user.login] = r;
+  }
+
+  const latest = Object.values(latestByUser);
+  if (latest.length === 0) return { status: 'pending', label: 'Pending' };
+
+  const hasChangesReq = latest.some(r => r.state === 'CHANGES_REQUESTED');
+  if (hasChangesReq) return { status: 'changes', label: 'Changes requested' };
+
+  const allApproved = latest.every(r => r.state === 'APPROVED');
+  if (allApproved) return { status: 'approved', label: 'Approved' };
+
+  return { status: 'pending', label: 'In review' };
+}
+
+// ---------- Rendering ----------
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d`;
+  return `${Math.floor(days / 30)}mo`;
+}
+
+function labelPill(label) {
+  const name = label.name.toLowerCase();
+  let cls = 'pill-other';
+  if (name === 'bug') cls = 'pill-bug';
+  else if (name === 'enhancement') cls = 'pill-enhancement';
+  else if (name === 'claimed') cls = 'pill-claimed';
+  else if (name === 'question') cls = 'pill-question';
+  else if (name.includes('clarification')) cls = 'pill-needs-clarification';
+  return `<span class="pill ${cls}">${esc(label.name)}</span>`;
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderStats() {
+  const issues = state.issues;
+  const prs = state.prs;
+  const bugs = issues.filter(i => i.labels.some(l => l.name === 'bug')).length;
+  const claimed = issues.filter(i => i.labels.some(l => l.name === 'claimed')).length;
+  const claudeFails = Object.values(state.prClaudeStatus || {}).filter(s => s.status === 'fail').length;
+  const changesReq = Object.values(state.prReviewStatus || {}).filter(s => s.status === 'changes').length;
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-card">
+      <div class="label">Open Issues</div>
+      <div class="value accent">${issues.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Bugs</div>
+      <div class="value red">${bugs}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Claimed</div>
+      <div class="value green">${claimed}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Open PRs</div>
+      <div class="value accent">${prs.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Claude Fails</div>
+      <div class="value red">${claudeFails}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Changes Requested</div>
+      <div class="value yellow">${changesReq}</div>
+    </div>
+  `;
+}
+
+function renderIssues() {
+  const repo = localStorage.getItem(REPO_KEY);
+  let issues = state.issues;
+
+  // Apply filter
+  if (state.issueFilter === 'bug') issues = issues.filter(i => i.labels.some(l => l.name === 'bug'));
+  else if (state.issueFilter === 'enhancement') issues = issues.filter(i => i.labels.some(l => l.name === 'enhancement'));
+  else if (state.issueFilter === 'claimed') issues = issues.filter(i => i.labels.some(l => l.name === 'claimed'));
+  else if (state.issueFilter === 'unclaimed') issues = issues.filter(i => !i.labels.some(l => l.name === 'claimed'));
+  else if (state.issueFilter === 'claude-triaged') issues = issues.filter(i => state.issueClaudeStatus[i.number]);
+
+  document.getElementById('issues-count').textContent = issues.length;
+
+  // Render filter buttons
+  const filterDefs = [
+    { key: 'all', label: 'All' },
+    { key: 'bug', label: '🐛 Bugs' },
+    { key: 'enhancement', label: '✨ Enhancements' },
+    { key: 'claimed', label: '🟢 Claimed' },
+    { key: 'unclaimed', label: '⚪ Unclaimed' },
+    { key: 'claude-triaged', label: '🤖 Claude triaged' },
+  ];
+  document.getElementById('issues-filters').innerHTML = filterDefs.map(f =>
+    `<button class="filter-btn ${state.issueFilter === f.key ? 'active' : ''}"
+             onclick="setIssueFilter('${f.key}')">${f.label}</button>`
+  ).join('');
+
+  if (issues.length === 0) {
+    document.getElementById('issues-body').innerHTML =
+      '<tr><td colspan="6" class="loading-msg" style="color:var(--text-muted)">No issues match this filter</td></tr>';
+    return;
+  }
+
+  document.getElementById('issues-body').innerHTML = issues.map(issue => {
+    const claudeTriaged = state.issueClaudeStatus[issue.number];
+    const claudeHtml = claudeTriaged
+      ? '<span class="claude-badge claude-triaged"><span class="claude-icon">🤖</span> Triaged</span>'
+      : '<span style="color:var(--text-muted)">—</span>';
+
+    return `<tr>
+      <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">#${issue.number}</a></td>
+      <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">${esc(issue.title)}</a></td>
+      <td>
+        <div class="author-cell">
+          <img class="avatar" src="${issue.user.avatar_url}&s=40" alt="" />
+          <a href="https://github.com/${issue.user.login}" target="_blank">${esc(issue.user.login)}</a>
+        </div>
+      </td>
+      <td>${issue.labels.map(labelPill).join(' ')}</td>
+      <td>${claudeHtml}</td>
+      <td title="${new Date(issue.created_at).toLocaleDateString()}">${timeAgo(issue.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPRs() {
+  const repo = localStorage.getItem(REPO_KEY);
+  let prs = state.prs;
+
+  if (state.prFilter === 'claude-pass') prs = prs.filter(p => state.prClaudeStatus[p.number]?.status === 'pass');
+  else if (state.prFilter === 'claude-fail') prs = prs.filter(p => state.prClaudeStatus[p.number]?.status === 'fail');
+  else if (state.prFilter === 'changes-requested') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'changes');
+  else if (state.prFilter === 'approved') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'approved');
+  else if (state.prFilter === 'needs-review') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'pending');
+
+  document.getElementById('prs-count').textContent = prs.length;
+
+  const filterDefs = [
+    { key: 'all', label: 'All' },
+    { key: 'claude-pass', label: '✅ Claude Pass' },
+    { key: 'claude-fail', label: '❌ Claude Fail' },
+    { key: 'approved', label: '👍 Approved' },
+    { key: 'changes-requested', label: '🔄 Changes Req.' },
+    { key: 'needs-review', label: '⏳ Needs Review' },
+  ];
+  document.getElementById('prs-filters').innerHTML = filterDefs.map(f =>
+    `<button class="filter-btn ${state.prFilter === f.key ? 'active' : ''}"
+             onclick="setPRFilter('${f.key}')">${f.label}</button>`
+  ).join('');
+
+  if (prs.length === 0) {
+    document.getElementById('prs-body').innerHTML =
+      '<tr><td colspan="7" class="loading-msg" style="color:var(--text-muted)">No PRs match this filter</td></tr>';
+    return;
+  }
+
+  document.getElementById('prs-body').innerHTML = prs.map(pr => {
+    const ci = state.prCIStatus[pr.number] || { status: 'none', label: '—' };
+    const claude = state.prClaudeStatus[pr.number] || { status: 'none', label: '—' };
+    const review = state.prReviewStatus[pr.number] || { status: 'pending', label: 'Pending' };
+
+    const ciCls = ci.status === 'pass' ? 'ci-pass' : ci.status === 'fail' ? 'ci-fail' : 'ci-pending';
+    const claudeCls = `claude-${claude.status}`;
+    const reviewCls = review.status === 'approved' ? 'review-approved' :
+                      review.status === 'changes' ? 'review-changes' : 'review-pending';
+
+    const ciIcon = ci.status === 'pass' ? '✓' : ci.status === 'fail' ? '✗' : ci.status === 'pending' ? '◌' : '';
+    const claudeIcon = claude.status === 'pass' ? '✓' : claude.status === 'fail' ? '✗' : claude.status === 'pending' ? '◌' : '';
+
+    return `<tr>
+      <td><a href="https://github.com/${localStorage.getItem(REPO_KEY)}/pull/${pr.number}" target="_blank">#${pr.number}</a></td>
+      <td>
+        <a href="https://github.com/${localStorage.getItem(REPO_KEY)}/pull/${pr.number}" target="_blank">${esc(pr.title)}</a>
+        ${pr.draft ? '<span class="pill pill-other">Draft</span>' : ''}
+      </td>
+      <td>
+        <div class="author-cell">
+          <img class="avatar" src="${pr.user.avatar_url}&s=40" alt="" />
+          <a href="https://github.com/${pr.user.login}" target="_blank">${esc(pr.user.login)}</a>
+        </div>
+      </td>
+      <td><span class="${ciCls}">${ciIcon} ${ci.label}</span></td>
+      <td><span class="claude-badge ${claudeCls}"><span class="claude-icon">🤖</span> ${claude.label}</span></td>
+      <td><span class="${reviewCls}">${review.label}</span></td>
+      <td title="${new Date(pr.created_at).toLocaleDateString()}">${timeAgo(pr.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderActivity() {
+  const list = document.getElementById('activity-list');
+  const activities = state.activity;
+
+  document.getElementById('activity-count').textContent = activities.length;
+
+  if (activities.length === 0) {
+    list.innerHTML = '<li class="activity-item" style="color:var(--text-muted)">No recent Claude activity</li>';
+    return;
+  }
+
+  list.innerHTML = activities.slice(0, 30).map(a => `
+    <li class="activity-item">
+      <span class="activity-icon">${a.icon}</span>
+      <span>${a.html}</span>
+      <span class="activity-time">${timeAgo(a.date)}</span>
+    </li>
+  `).join('');
+}
+
+// ---------- Filters ----------
+function setIssueFilter(key) {
+  state.issueFilter = key;
+  renderIssues();
+}
+function setPRFilter(key) {
+  state.prFilter = key;
+  renderPRs();
+}
+
+// ---------- Main refresh ----------
+async function refresh() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span> Loading';
+
+  try {
+    // Fetch issues and PRs in parallel
+    const [issues, prs] = await Promise.all([fetchIssues(), fetchPRs()]);
+    state.issues = issues;
+    state.prs = prs;
+
+    // Fetch Claude triage status for issues (check comments for bot activity)
+    state.issueClaudeStatus = {};
+    const issueCommentPromises = issues.map(async (issue) => {
+      try {
+        const comments = await ghFetchAll(`/issues/${issue.number}/comments`);
+        const claudeComment = comments.find(c => isClaudeBot(c.user.login));
+        if (claudeComment) {
+          state.issueClaudeStatus[issue.number] = true;
+        }
+      } catch {}
+    });
+    await Promise.all(issueCommentPromises);
+
+    // Fetch PR check runs and reviews in parallel
+    state.prClaudeStatus = {};
+    state.prCIStatus = {};
+    state.prReviewStatus = {};
+
+    const prDetailPromises = prs.map(async (pr) => {
+      try {
+        const [checks, reviews] = await Promise.all([
+          ghFetch(`/commits/${pr.head.sha}/check-runs?per_page=100`).then(d => d.check_runs || []).catch(() => []),
+          ghFetchAll(`/pulls/${pr.number}/reviews`).catch(() => []),
+        ]);
+        state.prClaudeStatus[pr.number] = getClaudeReviewStatus(checks);
+        state.prCIStatus[pr.number] = getCIStatus(checks);
+        state.prReviewStatus[pr.number] = getReviewDecision(reviews);
+      } catch {}
+    });
+    await Promise.all(prDetailPromises);
+
+    // Build activity feed from issue comments + PR reviews by Claude
+    state.activity = [];
+    const repo = localStorage.getItem(REPO_KEY);
+
+    // Claude issue comments
+    for (const issue of issues) {
+      if (!state.issueClaudeStatus[issue.number]) continue;
+      try {
+        const comments = await ghFetchAll(`/issues/${issue.number}/comments`);
+        for (const c of comments) {
+          if (!isClaudeBot(c.user.login)) continue;
+          const body = c.body.length > 120 ? c.body.slice(0, 120) + '…' : c.body;
+          state.activity.push({
+            icon: '💬',
+            html: `Triaged <a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">#${issue.number}</a> — <span style="color:var(--text-muted)">${esc(body)}</span>`,
+            date: c.created_at,
+          });
+        }
+      } catch {}
+    }
+
+    // Claude PR reviews / comments
+    for (const pr of prs) {
+      const cs = state.prClaudeStatus[pr.number];
+      if (cs && cs.status !== 'none' && cs.status !== 'skipped') {
+        const icon = cs.status === 'pass' ? '✅' : cs.status === 'fail' ? '❌' : '⏳';
+        state.activity.push({
+          icon,
+          html: `Reviewed <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — ${cs.label}`,
+          date: pr.updated_at,
+        });
+      }
+
+      // Check for Claude-authored commits (autofixes)
+      try {
+        const commits = await ghFetchAll(`/pulls/${pr.number}/commits`);
+        for (const c of commits) {
+          const authorName = (c.commit?.author?.name || '').toLowerCase();
+          if (authorName.includes('claude') || authorName.includes('github-actions')) {
+            if (c.commit.message.toLowerCase().includes('fix') || c.commit.message.toLowerCase().includes('autofix')) {
+              state.activity.push({
+                icon: '🔧',
+                html: `Autofix on <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — <span style="color:var(--text-muted)">${esc(c.commit.message.split('\n')[0])}</span>`,
+                date: c.commit.author.date,
+              });
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // Check for Claude-opened PRs (recently closed ones too)
+    try {
+      const recentPRs = await ghFetchAll('/pulls?state=all&sort=created&direction=desc&per_page=30');
+      for (const pr of recentPRs) {
+        if (isClaudeBot(pr.user.login)) {
+          state.activity.push({
+            icon: '🚀',
+            html: `Opened PR <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — ${esc(pr.title)}`,
+            date: pr.created_at,
+          });
+        }
+      }
+    } catch {}
+
+    // Sort activity by date desc
+    state.activity.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Deduplicate activity by html content
+    const seen = new Set();
+    state.activity = state.activity.filter(a => {
+      if (seen.has(a.html)) return false;
+      seen.add(a.html);
+      return true;
+    });
+
+    renderStats();
+    renderIssues();
+    renderPRs();
+    renderActivity();
+
+    document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+  } catch (err) {
+    console.error(err);
+    document.getElementById('issues-body').innerHTML =
+      `<tr><td colspan="6" class="error-msg">Error: ${esc(err.message)}</td></tr>`;
+  }
+
+  btn.classList.remove('loading');
+  btn.innerHTML = '<span>↻</span> Refresh';
+}
+
+// ---------- Boot ----------
+init();
+</script>
+</body>
+</html>
