@@ -1,41 +1,70 @@
 # Team Tracker Dashboard
 
-A single-page dashboard for tracking GitHub issues and pull requests, with built-in awareness of Claude automations (issue triage, PR review verdicts, autofix attempts).
-
-![Dark theme, auto-refreshing dashboard](https://img.shields.io/badge/theme-dark-0d1117)
+A dashboard for tracking GitHub issues and pull requests, with built-in awareness of Claude automations (issue triage, PR review verdicts, autofix attempts).
 
 ## Quick Start
 
-Just open `index.html` in your browser:
-
 ```bash
-# Option 1: open directly
-open index.html        # macOS
-xdg-open index.html    # Linux
+# 1. Clone the repo
+git clone <repo-url> && cd team-tracker-dashboard
 
-# Option 2: serve locally (avoids any file:// quirks)
-python3 -m http.server 8090
-# then visit http://localhost:8090
+# 2. Install dependencies
+npm install
+
+# 3. Configure your GitHub token
+cp .env.example .env
+# Edit .env with your real token
+
+# 4. Start the server
+npm start
+# Visit http://localhost:3000
 ```
 
-On first load, you'll be prompted to enter:
+## Configuration
 
-1. **GitHub Personal Access Token** — needs `repo` scope ([create one here](https://github.com/settings/tokens/new?scopes=repo))
-2. **Repository** — defaults to `red-hat-data-services/rhai-org-pulse`, but you can point it at any repo
+Create a `.env` file with:
 
-Your token is stored in `localStorage` — it never leaves your browser.
+```
+GITHUB_TOKEN=ghp_your_token_here
+GITHUB_REPO=red-hat-data-services/rhai-org-pulse
+PORT=3000
+```
+
+- **GITHUB_TOKEN** — a GitHub Personal Access Token with `repo` scope ([create one here](https://github.com/settings/tokens/new?scopes=repo))
+- **GITHUB_REPO** — the `owner/repo` to track
+- **PORT** — server port (defaults to 3000)
 
 ## Features
 
-- **Issues view** — open issues with labels, author, age, and whether Claude has triaged them
-- **PRs view** — open PRs with CI status, Claude review verdict (PASS/FAIL/pending), review decisions, and autofix status
+- **Tabbed views** — separate tabs for Issues, Pull Requests, and Claude Activity
+- **PR cards** — color-coded card view for pull requests:
+  - **Green** — all checks passing
+  - **Yellow** — needs rebase (branch is behind)
+  - **Red** — merge conflicts, CI failure, or Claude review failure
+- **Approve & Merge** — approve PRs directly from the dashboard, or merge approved PRs with one click. Your own PRs skip the approve step and show the merge button directly.
 - **Stats bar** — at-a-glance counts for open issues, bugs, claimed items, open PRs, Claude fails, and changes requested
-- **Auto-refresh** — data refreshes every 5 minutes
-- **Direct links** — every item links to its GitHub page
+- **Filters** — filter issues and PRs by status, labels, Claude triage, review state, etc.
+- **Server-side caching** — GitHub data is cached locally in JSON files. Page loads are instant; background refresh happens every 5 minutes.
+- **Manual refresh** — hit the Refresh button to pull fresh data from GitHub on demand
+- **Tab persistence** — your active tab is preserved across page refreshes via URL hash
+
+## Architecture
+
+- **`server.js`** — Node.js/Express backend that fetches GitHub data, caches it to `data/cache.json`, and proxies approve/merge actions
+- **`index.html`** — single-file frontend (HTML + CSS + JS) served by the backend
+- **`.env`** — GitHub token and repo configuration (not committed)
+
+### API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Serve the dashboard |
+| `GET` | `/api/data` | Return cached data (instant) |
+| `POST` | `/api/refresh` | Trigger a fresh GitHub fetch |
+| `POST` | `/api/prs/:number/approve` | Submit an approving review |
+| `PUT` | `/api/prs/:number/merge` | Merge a pull request |
 
 ## Requirements
 
-- A modern browser (Chrome, Firefox, Safari, Edge)
+- Node.js 18+
 - A GitHub PAT with `repo` scope
-
-No build step, no dependencies, no server required.

@@ -45,22 +45,6 @@
   .refresh-btn.loading { opacity: 0.6; pointer-events: none; }
   .last-updated { font-size: 12px; color: var(--text-muted); }
 
-  /* Setup */
-  .setup {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    padding: 24px; max-width: 500px; margin: 80px auto;
-  }
-  .setup h2 { margin-bottom: 12px; font-size: 16px; }
-  .setup p { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
-  .setup input {
-    width: 100%; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text); font-size: 14px; margin-bottom: 12px;
-  }
-  .setup button {
-    background: var(--green); color: #fff; border: none; padding: 8px 20px;
-    border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
-  }
-
   /* Stats bar */
   .stats-bar {
     display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
@@ -146,6 +130,97 @@
   .ci-fail { color: var(--red); }
   .ci-pending { color: var(--yellow); }
 
+  /* PR Cards */
+  .pr-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+  .pr-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .pr-card:hover { border-color: var(--text-muted); }
+  .pr-card.checks-pass {
+    background: #116329; border-color: #3fb950; color: #fff;
+  }
+  .pr-card.checks-pass .pr-card-number,
+  .pr-card.checks-pass .pr-card-age,
+  .pr-card.checks-pass .pr-card-meta-item,
+  .pr-card.checks-pass .review-pending { color: rgba(255,255,255,0.8); }
+  .pr-card.checks-pass .pr-card-title a { color: #fff; }
+  .pr-card.checks-pass .pr-card-title a:hover { color: #6fdd8b; }
+  .pr-card.checks-pass a { color: #fff; }
+  .pr-card.checks-pass:hover { border-color: #6fdd8b; }
+  .pr-card.needs-rebase {
+    background: #8a7000; border-color: #f0d000; color: #fff;
+  }
+  .pr-card.needs-rebase .pr-card-number,
+  .pr-card.needs-rebase .pr-card-age,
+  .pr-card.needs-rebase .pr-card-meta-item,
+  .pr-card.needs-rebase .review-pending { color: rgba(255,255,255,0.8); }
+  .pr-card.needs-rebase .pr-card-title a { color: #fff; }
+  .pr-card.needs-rebase .pr-card-title a:hover { color: #ffe14d; }
+  .pr-card.needs-rebase a { color: #fff; }
+  .pr-card.needs-rebase:hover { border-color: #ffe14d; }
+  .pr-card.has-conflicts {
+    background: #8b1a1a; border-color: #f85149; color: #fff;
+  }
+  .pr-card.has-conflicts .pr-card-number,
+  .pr-card.has-conflicts .pr-card-age,
+  .pr-card.has-conflicts .pr-card-meta-item,
+  .pr-card.has-conflicts .review-pending { color: rgba(255,255,255,0.8); }
+  .pr-card.has-conflicts .pr-card-title a { color: #fff; }
+  .pr-card.has-conflicts .pr-card-title a:hover { color: #ff8882; }
+  .pr-card.has-conflicts a { color: #fff; }
+  .pr-card.has-conflicts:hover { border-color: #ff8882; }
+  .pr-card-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .pr-card-number { color: var(--text-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .pr-card-title {
+    font-size: 14px; font-weight: 600; line-height: 1.4;
+  }
+  .pr-card-title a { color: var(--text); }
+  .pr-card-title a:hover { color: var(--accent); }
+  .pr-card-author {
+    display: flex; align-items: center; gap: 8px; font-size: 13px;
+  }
+  .pr-card-author .avatar { width: 22px; height: 22px; }
+  .pr-card-meta {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px;
+  }
+  .pr-card-meta-item {
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .pr-card-age { color: var(--text-muted); font-size: 12px; margin-left: auto; }
+  .pr-card-actions { margin-top: auto; display: flex; justify-content: flex-end; }
+  .approve-btn {
+    background: var(--green); color: #fff; border: none; padding: 5px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .approve-btn:hover { background: #2ea043; }
+  .approve-btn:disabled {
+    background: var(--border); color: var(--text-muted); cursor: not-allowed; opacity: 0.5;
+  }
+  .approve-btn.loading { opacity: 0.6; pointer-events: none; }
+  .merge-btn {
+    background: var(--purple); color: #fff; border: none; padding: 5px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .merge-btn:hover { background: #a371f7; }
+  .merge-btn:disabled {
+    background: var(--border); color: var(--text-muted); cursor: not-allowed; opacity: 0.5;
+  }
+  .merge-btn.loading { opacity: 0.6; pointer-events: none; }
+  .pr-card-empty {
+    text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+
   /* Activity feed */
   .activity-list { list-style: none; }
   .activity-item {
@@ -155,6 +230,27 @@
   .activity-item:last-child { border-bottom: none; }
   .activity-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
   .activity-time { color: var(--text-muted); font-size: 11px; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    background: transparent; border: none; color: var(--text-muted);
+    padding: 10px 20px; font-size: 14px; cursor: pointer;
+    border-bottom: 2px solid transparent; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-btn .tab-count {
+    background: var(--border); color: var(--text-muted); font-size: 11px;
+    padding: 0 7px; border-radius: 10px; font-weight: 500;
+  }
+  .tab-btn.active .tab-count { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 
   /* Loading */
   .loading-msg {
@@ -186,18 +282,8 @@
 <body>
 
 <div class="container" id="app">
-  <!-- Setup screen -->
-  <div class="setup" id="setup-screen" style="display:none">
-    <h2>🔧 Dashboard Setup</h2>
-    <p>Enter a GitHub personal access token with <code>repo</code> scope to fetch data from <strong>red-hat-data-services/rhai-org-pulse</strong>.</p>
-    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
-    <p style="margin-bottom:8px">Repo (owner/name):</p>
-    <input type="text" id="repo-input" value="red-hat-data-services/rhai-org-pulse" />
-    <button onclick="saveSetup()">Connect</button>
-  </div>
-
   <!-- Dashboard -->
-  <div id="dashboard" style="display:none">
+  <div id="dashboard">
     <header>
       <h1>📋 Team Tracker <span>GitHub Dashboard</span></h1>
       <div class="header-controls">
@@ -205,252 +291,78 @@
         <button class="refresh-btn" onclick="refresh()" id="refresh-btn">
           <span>↻</span> Refresh
         </button>
-        <button class="refresh-btn" onclick="logout()" style="font-size:12px">⚙️</button>
       </div>
     </header>
 
     <!-- Stats -->
     <div class="stats-bar" id="stats-bar"></div>
 
-    <!-- Issues -->
-    <div class="section" id="issues-section">
-      <div class="section-header">
-        <h2>Issues <span class="count" id="issues-count">0</span></h2>
-        <div class="filters" id="issues-filters"></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px">#</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Labels</th>
-              <th>Claude</th>
-              <th>Age</th>
-            </tr>
-          </thead>
-          <tbody id="issues-body">
-            <tr><td colspan="6" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
-          </tbody>
-        </table>
+    <!-- Tabs -->
+    <div class="tabs" id="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('issues')">Issues <span class="tab-count" id="tab-issues-count">0</span></button>
+      <button class="tab-btn" onclick="switchTab('prs')">Pull Requests <span class="tab-count" id="tab-prs-count">0</span></button>
+      <button class="tab-btn" onclick="switchTab('activity')">Claude Activity <span class="tab-count" id="tab-activity-count">0</span></button>
+    </div>
+
+    <!-- Issues Tab -->
+    <div class="tab-panel active" id="tab-issues">
+      <div class="section">
+        <div class="section-header">
+          <div></div>
+          <div class="filters" id="issues-filters"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px">#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Labels</th>
+                <th>Claude</th>
+                <th>Age</th>
+              </tr>
+            </thead>
+            <tbody id="issues-body">
+              <tr><td colspan="6" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Pull Requests -->
-    <div class="section" id="prs-section">
-      <div class="section-header">
-        <h2>Pull Requests <span class="count" id="prs-count">0</span></h2>
-        <div class="filters" id="prs-filters"></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px">#</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>CI</th>
-              <th>Claude Review</th>
-              <th>Review</th>
-              <th>Age</th>
-            </tr>
-          </thead>
-          <tbody id="prs-body">
-            <tr><td colspan="7" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
-          </tbody>
-        </table>
+    <!-- Pull Requests Tab -->
+    <div class="tab-panel" id="tab-prs">
+      <div class="section">
+        <div class="section-header">
+          <div></div>
+          <div class="filters" id="prs-filters"></div>
+        </div>
+        <div id="prs-grid" class="pr-card-grid">
+          <div class="pr-card-empty"><div class="spinner"></div> Loading…</div>
+        </div>
       </div>
     </div>
 
-    <!-- Claude Activity -->
-    <div class="section">
-      <div class="section-header">
-        <h2>🤖 Claude Activity <span class="count" id="activity-count">0</span></h2>
-      </div>
-      <div class="table-wrap">
-        <ul class="activity-list" id="activity-list">
-          <li class="activity-item loading-msg"><div class="spinner"></div> Loading…</li>
-        </ul>
+    <!-- Claude Activity Tab -->
+    <div class="tab-panel" id="tab-activity">
+      <div class="section">
+        <div class="table-wrap">
+          <ul class="activity-list" id="activity-list">
+            <li class="activity-item loading-msg"><div class="spinner"></div> Loading…</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const CLAUDE_BOTS = [
-  'github-actions[bot]',
-  'claude-issue-assistant[bot]',
-  'anthropic-claude[bot]',
-  'claude[bot]',
-];
-const REPO_KEY = 'tt-dash-repo';
-const TOKEN_KEY = 'tt-dash-token';
-const REFRESH_MS = 5 * 60 * 1000;
+let state = { issues: [], prs: [], activity: [], issueFilter: 'all', prFilter: 'all',
+              issueClaudeStatus: {}, prClaudeStatus: {}, prCIStatus: {}, prReviewStatus: {}, prMergeStatus: {},
+              repo: '' };
 
-let state = { issues: [], prs: [], activity: [], issueFilter: 'all', prFilter: 'all' };
-let refreshTimer = null;
-
-// ---------- Setup ----------
-function init() {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const repo = localStorage.getItem(REPO_KEY);
-  if (token && repo) {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    refresh();
-    refreshTimer = setInterval(refresh, REFRESH_MS);
-  } else {
-    document.getElementById('setup-screen').style.display = 'block';
-    document.getElementById('dashboard').style.display = 'none';
-  }
-}
-
-function saveSetup() {
-  const token = document.getElementById('token-input').value.trim();
-  const repo = document.getElementById('repo-input').value.trim();
-  if (!token || !repo) return;
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(REPO_KEY, repo);
-  init();
-}
-
-function logout() {
-  localStorage.removeItem(TOKEN_KEY);
-  clearInterval(refreshTimer);
-  init();
-}
-
-// ---------- API ----------
-async function ghFetch(path) {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const repo = localStorage.getItem(REPO_KEY);
-  const resp = await fetch(`https://api.github.com/repos/${repo}${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-  });
-  if (!resp.ok) throw new Error(`GitHub API ${resp.status}: ${resp.statusText}`);
-  return resp.json();
-}
-
-async function ghFetchAll(path, maxPages = 5) {
-  let results = [];
-  let page = 1;
-  while (page <= maxPages) {
-    const sep = path.includes('?') ? '&' : '?';
-    const data = await ghFetch(`${path}${sep}per_page=100&page=${page}`);
-    if (!Array.isArray(data) || data.length === 0) break;
-    results = results.concat(data);
-    if (data.length < 100) break;
-    page++;
-  }
-  return results;
-}
-
-// ---------- Data fetching ----------
-async function fetchIssues() {
-  const issues = await ghFetchAll('/issues?state=open&sort=updated&direction=desc');
-  // /issues also returns PRs — filter them out
-  return issues.filter(i => !i.pull_request);
-}
-
-async function fetchPRs() {
-  return ghFetchAll('/pulls?state=open&sort=updated&direction=desc');
-}
-
-async function fetchIssueComments(issueNum) {
-  return ghFetchAll(`/issues/${issueNum}/comments`);
-}
-
-async function fetchPRChecks(prNum) {
-  try {
-    // Get check runs for the PR's head SHA
-    const pr = state.prs.find(p => p.number === prNum);
-    if (!pr) return [];
-    const data = await ghFetch(`/commits/${pr.head.sha}/check-runs?per_page=100`);
-    return data.check_runs || [];
-  } catch { return []; }
-}
-
-async function fetchReviews(prNum) {
-  try {
-    return await ghFetchAll(`/pulls/${prNum}/reviews`);
-  } catch { return []; }
-}
-
-// ---------- Claude detection ----------
-function isClaudeBot(login) {
-  return CLAUDE_BOTS.some(b => login.toLowerCase() === b.toLowerCase()) ||
-         login.toLowerCase().includes('claude');
-}
-
-function getClaudeReviewStatus(checks) {
-  const claudeChecks = checks.filter(c =>
-    c.name === 'Claude Review' || c.name === 'Claude Review (Fork)'
-  );
-  if (claudeChecks.length === 0) return { status: 'none', label: '—' };
-
-  // Find the substantive (non-skipped) ones
-  const substantive = claudeChecks.filter(c => c.conclusion !== 'skipped' && c.conclusion !== null);
-  if (substantive.length === 0) {
-    const pending = claudeChecks.filter(c => c.status !== 'completed');
-    if (pending.length > 0) return { status: 'pending', label: 'Pending' };
-    return { status: 'skipped', label: 'Skipped' };
-  }
-
-  // Check output for PASS/FAIL verdict
-  for (const check of substantive) {
-    const text = (check.output?.text || '') + (check.output?.summary || '');
-    if (/\"verdict\"\s*:\s*\"FAIL\"/i.test(text) || /verdict.*FAIL/i.test(text)) {
-      return { status: 'fail', label: 'FAIL' };
-    }
-  }
-
-  // If all succeeded
-  const allSuccess = substantive.every(c => c.conclusion === 'success');
-  if (allSuccess) return { status: 'pass', label: 'PASS' };
-
-  const anyFail = substantive.some(c => c.conclusion === 'failure');
-  if (anyFail) return { status: 'fail', label: 'FAIL' };
-
-  return { status: 'pending', label: 'Running' };
-}
-
-function getCIStatus(checks) {
-  const ciCheck = checks.find(c => c.name === 'Test & Build');
-  if (!ciCheck) return { status: 'none', label: '—' };
-  if (ciCheck.status !== 'completed') return { status: 'pending', label: 'Running' };
-  if (ciCheck.conclusion === 'success') return { status: 'pass', label: 'Pass' };
-  return { status: 'fail', label: 'Fail' };
-}
-
-function getReviewDecision(reviews) {
-  if (!reviews || reviews.length === 0) return { status: 'pending', label: 'Pending' };
-
-  // Get latest review per user (excluding bots)
-  const latestByUser = {};
-  for (const r of reviews) {
-    if (isClaudeBot(r.user.login)) continue;
-    if (r.state === 'COMMENTED') continue;
-    latestByUser[r.user.login] = r;
-  }
-
-  const latest = Object.values(latestByUser);
-  if (latest.length === 0) return { status: 'pending', label: 'Pending' };
-
-  const hasChangesReq = latest.some(r => r.state === 'CHANGES_REQUESTED');
-  if (hasChangesReq) return { status: 'changes', label: 'Changes requested' };
-
-  const allApproved = latest.every(r => r.state === 'APPROVED');
-  if (allApproved) return { status: 'approved', label: 'Approved' };
-
-  return { status: 'pending', label: 'In review' };
-}
-
-// ---------- Rendering ----------
+// ---------- Rendering helpers ----------
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -479,6 +391,7 @@ function esc(s) {
   return d.innerHTML;
 }
 
+// ---------- Render functions ----------
 function renderStats() {
   const issues = state.issues;
   const prs = state.prs;
@@ -488,54 +401,34 @@ function renderStats() {
   const changesReq = Object.values(state.prReviewStatus || {}).filter(s => s.status === 'changes').length;
 
   document.getElementById('stats-bar').innerHTML = `
-    <div class="stat-card">
-      <div class="label">Open Issues</div>
-      <div class="value accent">${issues.length}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Bugs</div>
-      <div class="value red">${bugs}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Claimed</div>
-      <div class="value green">${claimed}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Open PRs</div>
-      <div class="value accent">${prs.length}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Claude Fails</div>
-      <div class="value red">${claudeFails}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Changes Requested</div>
-      <div class="value yellow">${changesReq}</div>
-    </div>
+    <div class="stat-card"><div class="label">Open Issues</div><div class="value accent">${issues.length}</div></div>
+    <div class="stat-card"><div class="label">Bugs</div><div class="value red">${bugs}</div></div>
+    <div class="stat-card"><div class="label">Claimed</div><div class="value green">${claimed}</div></div>
+    <div class="stat-card"><div class="label">Open PRs</div><div class="value accent">${prs.length}</div></div>
+    <div class="stat-card"><div class="label">Claude Fails</div><div class="value red">${claudeFails}</div></div>
+    <div class="stat-card"><div class="label">Changes Requested</div><div class="value yellow">${changesReq}</div></div>
   `;
 }
 
 function renderIssues() {
-  const repo = localStorage.getItem(REPO_KEY);
+  const repo = state.repo;
   let issues = state.issues;
 
-  // Apply filter
   if (state.issueFilter === 'bug') issues = issues.filter(i => i.labels.some(l => l.name === 'bug'));
   else if (state.issueFilter === 'enhancement') issues = issues.filter(i => i.labels.some(l => l.name === 'enhancement'));
   else if (state.issueFilter === 'claimed') issues = issues.filter(i => i.labels.some(l => l.name === 'claimed'));
   else if (state.issueFilter === 'unclaimed') issues = issues.filter(i => !i.labels.some(l => l.name === 'claimed'));
   else if (state.issueFilter === 'claude-triaged') issues = issues.filter(i => state.issueClaudeStatus[i.number]);
 
-  document.getElementById('issues-count').textContent = issues.length;
+  document.getElementById('tab-issues-count').textContent = issues.length;
 
-  // Render filter buttons
   const filterDefs = [
     { key: 'all', label: 'All' },
-    { key: 'bug', label: '🐛 Bugs' },
-    { key: 'enhancement', label: '✨ Enhancements' },
-    { key: 'claimed', label: '🟢 Claimed' },
-    { key: 'unclaimed', label: '⚪ Unclaimed' },
-    { key: 'claude-triaged', label: '🤖 Claude triaged' },
+    { key: 'bug', label: 'Bugs' },
+    { key: 'enhancement', label: 'Enhancements' },
+    { key: 'claimed', label: 'Claimed' },
+    { key: 'unclaimed', label: 'Unclaimed' },
+    { key: 'claude-triaged', label: 'Claude triaged' },
   ];
   document.getElementById('issues-filters').innerHTML = filterDefs.map(f =>
     `<button class="filter-btn ${state.issueFilter === f.key ? 'active' : ''}"
@@ -551,18 +444,16 @@ function renderIssues() {
   document.getElementById('issues-body').innerHTML = issues.map(issue => {
     const claudeTriaged = state.issueClaudeStatus[issue.number];
     const claudeHtml = claudeTriaged
-      ? '<span class="claude-badge claude-triaged"><span class="claude-icon">🤖</span> Triaged</span>'
-      : '<span style="color:var(--text-muted)">—</span>';
+      ? '<span class="claude-badge claude-triaged"><span class="claude-icon">R</span> Triaged</span>'
+      : '<span style="color:var(--text-muted)">\u2014</span>';
 
     return `<tr>
       <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">#${issue.number}</a></td>
       <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">${esc(issue.title)}</a></td>
-      <td>
-        <div class="author-cell">
-          <img class="avatar" src="${issue.user.avatar_url}&s=40" alt="" />
-          <a href="https://github.com/${issue.user.login}" target="_blank">${esc(issue.user.login)}</a>
-        </div>
-      </td>
+      <td><div class="author-cell">
+        <img class="avatar" src="${issue.user.avatar_url}&s=40" alt="" />
+        <a href="https://github.com/${issue.user.login}" target="_blank">${esc(issue.user.login)}</a>
+      </div></td>
       <td>${issue.labels.map(labelPill).join(' ')}</td>
       <td>${claudeHtml}</td>
       <td title="${new Date(issue.created_at).toLocaleDateString()}">${timeAgo(issue.created_at)}</td>
@@ -571,7 +462,7 @@ function renderIssues() {
 }
 
 function renderPRs() {
-  const repo = localStorage.getItem(REPO_KEY);
+  const repo = state.repo;
   let prs = state.prs;
 
   if (state.prFilter === 'claude-pass') prs = prs.filter(p => state.prClaudeStatus[p.number]?.status === 'pass');
@@ -580,227 +471,230 @@ function renderPRs() {
   else if (state.prFilter === 'approved') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'approved');
   else if (state.prFilter === 'needs-review') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'pending');
 
-  document.getElementById('prs-count').textContent = prs.length;
+  document.getElementById('tab-prs-count').textContent = prs.length;
 
   const filterDefs = [
     { key: 'all', label: 'All' },
-    { key: 'claude-pass', label: '✅ Claude Pass' },
-    { key: 'claude-fail', label: '❌ Claude Fail' },
-    { key: 'approved', label: '👍 Approved' },
-    { key: 'changes-requested', label: '🔄 Changes Req.' },
-    { key: 'needs-review', label: '⏳ Needs Review' },
+    { key: 'claude-pass', label: 'Claude Pass' },
+    { key: 'claude-fail', label: 'Claude Fail' },
+    { key: 'approved', label: 'Approved' },
+    { key: 'changes-requested', label: 'Changes Req.' },
+    { key: 'needs-review', label: 'Needs Review' },
   ];
   document.getElementById('prs-filters').innerHTML = filterDefs.map(f =>
     `<button class="filter-btn ${state.prFilter === f.key ? 'active' : ''}"
              onclick="setPRFilter('${f.key}')">${f.label}</button>`
   ).join('');
 
+  const grid = document.getElementById('prs-grid');
+
   if (prs.length === 0) {
-    document.getElementById('prs-body').innerHTML =
-      '<tr><td colspan="7" class="loading-msg" style="color:var(--text-muted)">No PRs match this filter</td></tr>';
+    grid.innerHTML = '<div class="pr-card-empty">No PRs match this filter</div>';
     return;
   }
 
-  document.getElementById('prs-body').innerHTML = prs.map(pr => {
-    const ci = state.prCIStatus[pr.number] || { status: 'none', label: '—' };
-    const claude = state.prClaudeStatus[pr.number] || { status: 'none', label: '—' };
+  grid.innerHTML = prs.map(pr => {
+    const ci = state.prCIStatus[pr.number] || { status: 'none', label: '\u2014' };
+    const claude = state.prClaudeStatus[pr.number] || { status: 'none', label: '\u2014' };
     const review = state.prReviewStatus[pr.number] || { status: 'pending', label: 'Pending' };
 
+    const merge = state.prMergeStatus[pr.number] || 'clean';
+    const allChecksPassing = ci.status === 'pass' && claude.status !== 'fail' && merge !== 'conflicts';
+    let cardCls = 'pr-card';
+    if (merge === 'conflicts' || ci.status === 'fail' || claude.status === 'fail') cardCls = 'pr-card has-conflicts';
+    else if (merge === 'behind') cardCls = 'pr-card needs-rebase';
+    else if (ci.status === 'pass') cardCls = 'pr-card checks-pass';
+
     const ciCls = ci.status === 'pass' ? 'ci-pass' : ci.status === 'fail' ? 'ci-fail' : 'ci-pending';
+    const ciIcon = ci.status === 'pass' ? '\u2713' : ci.status === 'fail' ? '\u2717' : ci.status === 'pending' ? '\u25CC' : '';
     const claudeCls = `claude-${claude.status}`;
     const reviewCls = review.status === 'approved' ? 'review-approved' :
                       review.status === 'changes' ? 'review-changes' : 'review-pending';
 
-    const ciIcon = ci.status === 'pass' ? '✓' : ci.status === 'fail' ? '✗' : ci.status === 'pending' ? '◌' : '';
-    const claudeIcon = claude.status === 'pass' ? '✓' : claude.status === 'fail' ? '✗' : claude.status === 'pending' ? '◌' : '';
-
-    return `<tr>
-      <td><a href="https://github.com/${localStorage.getItem(REPO_KEY)}/pull/${pr.number}" target="_blank">#${pr.number}</a></td>
-      <td>
-        <a href="https://github.com/${localStorage.getItem(REPO_KEY)}/pull/${pr.number}" target="_blank">${esc(pr.title)}</a>
-        ${pr.draft ? '<span class="pill pill-other">Draft</span>' : ''}
-      </td>
-      <td>
-        <div class="author-cell">
-          <img class="avatar" src="${pr.user.avatar_url}&s=40" alt="" />
-          <a href="https://github.com/${pr.user.login}" target="_blank">${esc(pr.user.login)}</a>
+    return `<div class="${cardCls}">
+      <div class="pr-card-header">
+        <div class="pr-card-title">
+          <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">${esc(pr.title)}</a>
+          ${pr.draft ? ' <span class="pill pill-other">Draft</span>' : ''}
         </div>
-      </td>
-      <td><span class="${ciCls}">${ciIcon} ${ci.label}</span></td>
-      <td><span class="claude-badge ${claudeCls}"><span class="claude-icon">🤖</span> ${claude.label}</span></td>
-      <td><span class="${reviewCls}">${review.label}</span></td>
-      <td title="${new Date(pr.created_at).toLocaleDateString()}">${timeAgo(pr.created_at)}</td>
-    </tr>`;
+        <span class="pr-card-number">#${pr.number}</span>
+      </div>
+      <div class="pr-card-author">
+        <img class="avatar" src="${pr.user.avatar_url}&s=40" alt="" />
+        <a href="https://github.com/${pr.user.login}" target="_blank">${esc(pr.user.login)}</a>
+        <span class="pr-card-age" title="${new Date(pr.created_at).toLocaleDateString()}">${timeAgo(pr.created_at)}</span>
+      </div>
+      <div class="pr-card-meta">
+        <span class="pr-card-meta-item ${ciCls}">${ciIcon} CI: ${ci.label}</span>
+        <span class="pr-card-meta-item"><span class="claude-badge ${claudeCls}"><span class="claude-icon">R</span> ${claude.label}</span></span>
+        <span class="pr-card-meta-item ${reviewCls}">${review.label}</span>
+        ${merge === 'conflicts' ? '<span class="pr-card-meta-item" style="color:var(--red)">! Conflicts</span>' : ''}
+        ${merge === 'behind' ? '<span class="pr-card-meta-item" style="color:var(--yellow)">~ Needs rebase</span>' : ''}
+      </div>
+      <div class="pr-card-actions">
+        ${(review.status === 'approved' || pr.user.login === state.currentUser)
+          ? `<button class="merge-btn" id="merge-btn-${pr.number}"
+              onclick="mergePR(${pr.number})"
+              ${merge === 'conflicts' ? 'disabled title="Resolve conflicts before merging"' : ''}
+            >Merge</button>`
+          : `<button class="approve-btn" id="approve-btn-${pr.number}"
+              onclick="approvePR(${pr.number})"
+              ${allChecksPassing ? '' : 'disabled title="Checks must pass before approving"'}
+            >Approve</button>`
+        }
+      </div>
+    </div>`;
   }).join('');
 }
 
 function renderActivity() {
   const list = document.getElementById('activity-list');
+  const repo = state.repo;
   const activities = state.activity;
 
-  document.getElementById('activity-count').textContent = activities.length;
+  document.getElementById('tab-activity-count').textContent = activities.length;
 
   if (activities.length === 0) {
     list.innerHTML = '<li class="activity-item" style="color:var(--text-muted)">No recent Claude activity</li>';
     return;
   }
 
-  list.innerHTML = activities.slice(0, 30).map(a => `
-    <li class="activity-item">
+  list.innerHTML = activities.slice(0, 30).map(a => {
+    const link = a.prNumber
+      ? `<a href="https://github.com/${repo}/pull/${a.prNumber}" target="_blank">#${a.prNumber}</a>`
+      : a.issueNumber
+        ? `<a href="https://github.com/${repo}/issues/${a.issueNumber}" target="_blank">#${a.issueNumber}</a>`
+        : '';
+    const bodyHtml = a.body ? ` \u2014 <span style="color:var(--text-muted)">${esc(a.body)}</span>` : '';
+    return `<li class="activity-item">
       <span class="activity-icon">${a.icon}</span>
-      <span>${a.html}</span>
+      <span>${esc(a.text).replace(/#(\d+)/, link)}${bodyHtml}</span>
       <span class="activity-time">${timeAgo(a.date)}</span>
-    </li>
-  `).join('');
+    </li>`;
+  }).join('');
 }
 
-// ---------- Filters ----------
-function setIssueFilter(key) {
-  state.issueFilter = key;
+function renderAll() {
+  renderStats();
   renderIssues();
-}
-function setPRFilter(key) {
-  state.prFilter = key;
   renderPRs();
+  renderActivity();
 }
 
-// ---------- Main refresh ----------
+// ---------- Actions ----------
+async function approvePR(prNum) {
+  const btn = document.getElementById(`approve-btn-${prNum}`);
+  if (!btn) return;
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span> Approving';
+
+  try {
+    const resp = await fetch(`/api/prs/${prNum}/approve`, { method: 'POST' });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `${resp.status}`);
+    }
+    state.prReviewStatus[prNum] = { status: 'approved', label: 'Approved' };
+    renderPRs();
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.innerHTML = 'Failed';
+    btn.style.background = 'var(--red)';
+    btn.title = err.message;
+    setTimeout(() => { btn.innerHTML = 'Approve'; btn.style.background = ''; btn.classList.remove('loading'); }, 3000);
+  }
+}
+
+async function mergePR(prNum) {
+  const btn = document.getElementById(`merge-btn-${prNum}`);
+  if (!btn) return;
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span> Merging';
+
+  try {
+    const resp = await fetch(`/api/prs/${prNum}/merge`, { method: 'PUT' });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `${resp.status}`);
+    }
+    state.prs = state.prs.filter(p => p.number !== prNum);
+    renderStats();
+    renderPRs();
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.innerHTML = 'Failed';
+    btn.style.background = 'var(--red)';
+    btn.title = err.message;
+    setTimeout(() => { btn.innerHTML = 'Merge'; btn.style.background = ''; btn.classList.remove('loading'); }, 3000);
+  }
+}
+
+// ---------- Tabs & Filters ----------
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  const tabIndex = { issues: 0, prs: 1, activity: 2 };
+  btns[tabIndex[tab]].classList.add('active');
+  location.hash = tab;
+}
+
+function setIssueFilter(key) { state.issueFilter = key; renderIssues(); }
+function setPRFilter(key) { state.prFilter = key; renderPRs(); }
+
+// ---------- Data loading ----------
+function applyData(data) {
+  state.issues = data.issues || [];
+  state.prs = data.prs || [];
+  state.activity = data.activity || [];
+  state.issueClaudeStatus = data.issueClaudeStatus || {};
+  state.prClaudeStatus = data.prClaudeStatus || {};
+  state.prCIStatus = data.prCIStatus || {};
+  state.prReviewStatus = data.prReviewStatus || {};
+  state.prMergeStatus = data.prMergeStatus || {};
+  state.repo = data.repo || '';
+  state.currentUser = data.currentUser || '';
+  renderAll();
+  if (data.lastUpdated) {
+    document.getElementById('last-updated').textContent = `Updated ${new Date(data.lastUpdated).toLocaleTimeString()}`;
+  }
+}
+
+async function loadCached() {
+  try {
+    const resp = await fetch('/api/data');
+    const data = await resp.json();
+    if (data.lastUpdated) applyData(data);
+  } catch {}
+}
+
 async function refresh() {
   const btn = document.getElementById('refresh-btn');
   btn.classList.add('loading');
-  btn.innerHTML = '<span class="spinner"></span> Loading';
+  btn.innerHTML = '<span class="spinner"></span> Refreshing';
 
   try {
-    // Fetch issues and PRs in parallel
-    const [issues, prs] = await Promise.all([fetchIssues(), fetchPRs()]);
-    state.issues = issues;
-    state.prs = prs;
-
-    // Fetch Claude triage status for issues (check comments for bot activity)
-    state.issueClaudeStatus = {};
-    const issueCommentPromises = issues.map(async (issue) => {
-      try {
-        const comments = await ghFetchAll(`/issues/${issue.number}/comments`);
-        const claudeComment = comments.find(c => isClaudeBot(c.user.login));
-        if (claudeComment) {
-          state.issueClaudeStatus[issue.number] = true;
-        }
-      } catch {}
-    });
-    await Promise.all(issueCommentPromises);
-
-    // Fetch PR check runs and reviews in parallel
-    state.prClaudeStatus = {};
-    state.prCIStatus = {};
-    state.prReviewStatus = {};
-
-    const prDetailPromises = prs.map(async (pr) => {
-      try {
-        const [checks, reviews] = await Promise.all([
-          ghFetch(`/commits/${pr.head.sha}/check-runs?per_page=100`).then(d => d.check_runs || []).catch(() => []),
-          ghFetchAll(`/pulls/${pr.number}/reviews`).catch(() => []),
-        ]);
-        state.prClaudeStatus[pr.number] = getClaudeReviewStatus(checks);
-        state.prCIStatus[pr.number] = getCIStatus(checks);
-        state.prReviewStatus[pr.number] = getReviewDecision(reviews);
-      } catch {}
-    });
-    await Promise.all(prDetailPromises);
-
-    // Build activity feed from issue comments + PR reviews by Claude
-    state.activity = [];
-    const repo = localStorage.getItem(REPO_KEY);
-
-    // Claude issue comments
-    for (const issue of issues) {
-      if (!state.issueClaudeStatus[issue.number]) continue;
-      try {
-        const comments = await ghFetchAll(`/issues/${issue.number}/comments`);
-        for (const c of comments) {
-          if (!isClaudeBot(c.user.login)) continue;
-          const body = c.body.length > 120 ? c.body.slice(0, 120) + '…' : c.body;
-          state.activity.push({
-            icon: '💬',
-            html: `Triaged <a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">#${issue.number}</a> — <span style="color:var(--text-muted)">${esc(body)}</span>`,
-            date: c.created_at,
-          });
-        }
-      } catch {}
-    }
-
-    // Claude PR reviews / comments
-    for (const pr of prs) {
-      const cs = state.prClaudeStatus[pr.number];
-      if (cs && cs.status !== 'none' && cs.status !== 'skipped') {
-        const icon = cs.status === 'pass' ? '✅' : cs.status === 'fail' ? '❌' : '⏳';
-        state.activity.push({
-          icon,
-          html: `Reviewed <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — ${cs.label}`,
-          date: pr.updated_at,
-        });
-      }
-
-      // Check for Claude-authored commits (autofixes)
-      try {
-        const commits = await ghFetchAll(`/pulls/${pr.number}/commits`);
-        for (const c of commits) {
-          const authorName = (c.commit?.author?.name || '').toLowerCase();
-          if (authorName.includes('claude') || authorName.includes('github-actions')) {
-            if (c.commit.message.toLowerCase().includes('fix') || c.commit.message.toLowerCase().includes('autofix')) {
-              state.activity.push({
-                icon: '🔧',
-                html: `Autofix on <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — <span style="color:var(--text-muted)">${esc(c.commit.message.split('\n')[0])}</span>`,
-                date: c.commit.author.date,
-              });
-            }
-          }
-        }
-      } catch {}
-    }
-
-    // Check for Claude-opened PRs (recently closed ones too)
-    try {
-      const recentPRs = await ghFetchAll('/pulls?state=all&sort=created&direction=desc&per_page=30');
-      for (const pr of recentPRs) {
-        if (isClaudeBot(pr.user.login)) {
-          state.activity.push({
-            icon: '🚀',
-            html: `Opened PR <a href="https://github.com/${repo}/pull/${pr.number}" target="_blank">#${pr.number}</a> — ${esc(pr.title)}`,
-            date: pr.created_at,
-          });
-        }
-      }
-    } catch {}
-
-    // Sort activity by date desc
-    state.activity.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // Deduplicate activity by html content
-    const seen = new Set();
-    state.activity = state.activity.filter(a => {
-      if (seen.has(a.html)) return false;
-      seen.add(a.html);
-      return true;
-    });
-
-    renderStats();
-    renderIssues();
-    renderPRs();
-    renderActivity();
-
-    document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+    const resp = await fetch('/api/refresh', { method: 'POST' });
+    const data = await resp.json();
+    applyData(data);
   } catch (err) {
     console.error(err);
-    document.getElementById('issues-body').innerHTML =
-      `<tr><td colspan="6" class="error-msg">Error: ${esc(err.message)}</td></tr>`;
   }
 
   btn.classList.remove('loading');
-  btn.innerHTML = '<span>↻</span> Refresh';
+  btn.innerHTML = '<span>\u21BB</span> Refresh';
 }
 
 // ---------- Boot ----------
-init();
+(async () => {
+  const hashTab = location.hash.replace('#', '');
+  if (['issues', 'prs', 'activity'].includes(hashTab)) switchTab(hashTab);
+  await loadCached();
+  if (state.issues.length === 0 && state.prs.length === 0) {
+    refresh();
+  }
+})();
 </script>
 </body>
 </html>
