@@ -139,42 +139,27 @@
   .pr-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
     padding: 16px; display: flex; flex-direction: column; gap: 12px;
-    transition: border-color 0.15s;
   }
   .pr-card:hover { border-color: var(--text-muted); }
-  .pr-card.checks-pass {
-    background: #116329; border-color: #3fb950; color: #fff;
+  /* Flash yellow: needs your attention */
+  @keyframes flash-yellow {
+    0%, 100% { background: var(--surface); border-color: var(--yellow); box-shadow: 0 0 0 0 rgba(210, 153, 34, 0); }
+    50% { background: #3d2e00; border-color: #f0d000; box-shadow: 0 0 18px 4px rgba(210, 153, 34, 0.45); }
   }
-  .pr-card.checks-pass .pr-card-number,
-  .pr-card.checks-pass .pr-card-age,
-  .pr-card.checks-pass .pr-card-meta-item,
-  .pr-card.checks-pass .review-pending { color: rgba(255,255,255,0.8); }
-  .pr-card.checks-pass .pr-card-title a { color: #fff; }
-  .pr-card.checks-pass .pr-card-title a:hover { color: #6fdd8b; }
-  .pr-card.checks-pass a { color: #fff; }
-  .pr-card.checks-pass:hover { border-color: #6fdd8b; }
-  .pr-card.needs-rebase {
-    background: #8a7000; border-color: #f0d000; color: #fff;
+  .pr-card.flash-yellow {
+    animation: flash-yellow 1.2s ease-in-out infinite;
+    border-width: 2px;
   }
-  .pr-card.needs-rebase .pr-card-number,
-  .pr-card.needs-rebase .pr-card-age,
-  .pr-card.needs-rebase .pr-card-meta-item,
-  .pr-card.needs-rebase .review-pending { color: rgba(255,255,255,0.8); }
-  .pr-card.needs-rebase .pr-card-title a { color: #fff; }
-  .pr-card.needs-rebase .pr-card-title a:hover { color: #ffe14d; }
-  .pr-card.needs-rebase a { color: #fff; }
-  .pr-card.needs-rebase:hover { border-color: #ffe14d; }
-  .pr-card.has-conflicts {
-    background: #8b1a1a; border-color: #f85149; color: #fff;
+
+  /* Flash green: ready for action */
+  @keyframes flash-green {
+    0%, 100% { background: var(--surface); border-color: var(--green); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
+    50% { background: #0d3318; border-color: #6fdd8b; box-shadow: 0 0 18px 4px rgba(63, 185, 80, 0.45); }
   }
-  .pr-card.has-conflicts .pr-card-number,
-  .pr-card.has-conflicts .pr-card-age,
-  .pr-card.has-conflicts .pr-card-meta-item,
-  .pr-card.has-conflicts .review-pending { color: rgba(255,255,255,0.8); }
-  .pr-card.has-conflicts .pr-card-title a { color: #fff; }
-  .pr-card.has-conflicts .pr-card-title a:hover { color: #ff8882; }
-  .pr-card.has-conflicts a { color: #fff; }
-  .pr-card.has-conflicts:hover { border-color: #ff8882; }
+  .pr-card.flash-green {
+    animation: flash-green 1.2s ease-in-out infinite;
+    border-width: 2px;
+  }
   .pr-card-header {
     display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
   }
@@ -221,6 +206,38 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
   }
 
+  /* Issue Cards */
+  .issue-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+  .issue-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    transition: border-color 0.15s;
+  }
+  .issue-card:hover { border-color: var(--text-muted); }
+  .issue-card-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .issue-card-number { color: var(--text-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .issue-card-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+  .issue-card-title a { color: var(--text); text-decoration: none; }
+  .issue-card-title a:hover { color: var(--accent); }
+  .issue-card-author {
+    display: flex; align-items: center; gap: 8px; font-size: 13px;
+  }
+  .issue-card-author .avatar { width: 22px; height: 22px; }
+  .issue-card-meta {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .issue-card-age { color: var(--text-muted); font-size: 12px; margin-left: auto; }
+  .issue-card-empty {
+    text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+
   /* Activity feed */
   .activity-list { list-style: none; }
   .activity-item {
@@ -263,6 +280,24 @@
     border-radius: 50%; animation: spin 0.6s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .rebase-btn {
+    background: var(--yellow); color: #000; border: none; padding: 5px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .rebase-btn:hover { background: #e0b517; }
+  .rebase-btn:disabled {
+    background: var(--border); color: var(--text-muted); cursor: not-allowed; opacity: 0.5;
+  }
+  .rebase-btn.loading { opacity: 0.6; pointer-events: none; }
+  .approve-workflow-btn {
+    background: var(--orange); color: #fff; border: none; padding: 5px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .approve-workflow-btn:hover { background: #e07c34; }
+  .approve-workflow-btn.loading { opacity: 0.6; pointer-events: none; }
 
   /* Author avatar */
   .author-cell { display: flex; align-items: center; gap: 8px; }
@@ -311,22 +346,8 @@
           <div></div>
           <div class="filters" id="issues-filters"></div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:50px">#</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Labels</th>
-                <th>Claude</th>
-                <th>Age</th>
-              </tr>
-            </thead>
-            <tbody id="issues-body">
-              <tr><td colspan="6" class="loading-msg"><div class="spinner"></div> Loading…</td></tr>
-            </tbody>
-          </table>
+        <div id="issues-grid" class="issue-card-grid">
+          <div class="issue-card-empty"><div class="spinner"></div> Loading…</div>
         </div>
       </div>
     </div>
@@ -360,7 +381,7 @@
 <script>
 let state = { issues: [], prs: [], activity: [], issueFilter: 'all', prFilter: 'all',
               issueClaudeStatus: {}, prClaudeStatus: {}, prCIStatus: {}, prReviewStatus: {}, prMergeStatus: {},
-              repo: '' };
+              prPendingWorkflows: {}, repo: '' };
 
 // ---------- Rendering helpers ----------
 function timeAgo(dateStr) {
@@ -399,6 +420,7 @@ function renderStats() {
   const claimed = issues.filter(i => i.labels.some(l => l.name === 'claimed')).length;
   const claudeFails = Object.values(state.prClaudeStatus || {}).filter(s => s.status === 'fail').length;
   const changesReq = Object.values(state.prReviewStatus || {}).filter(s => s.status === 'changes').length;
+  const pendingWf = Object.keys(state.prPendingWorkflows || {}).length;
 
   document.getElementById('stats-bar').innerHTML = `
     <div class="stat-card"><div class="label">Open Issues</div><div class="value accent">${issues.length}</div></div>
@@ -407,6 +429,7 @@ function renderStats() {
     <div class="stat-card"><div class="label">Open PRs</div><div class="value accent">${prs.length}</div></div>
     <div class="stat-card"><div class="label">Claude Fails</div><div class="value red">${claudeFails}</div></div>
     <div class="stat-card"><div class="label">Changes Requested</div><div class="value yellow">${changesReq}</div></div>
+    ${pendingWf > 0 ? `<div class="stat-card"><div class="label">Workflows Pending</div><div class="value" style="color:var(--orange)">${pendingWf}</div></div>` : ''}
   `;
 }
 
@@ -435,29 +458,36 @@ function renderIssues() {
              onclick="setIssueFilter('${f.key}')">${f.label}</button>`
   ).join('');
 
+  const grid = document.getElementById('issues-grid');
+
   if (issues.length === 0) {
-    document.getElementById('issues-body').innerHTML =
-      '<tr><td colspan="6" class="loading-msg" style="color:var(--text-muted)">No issues match this filter</td></tr>';
+    grid.innerHTML = '<div class="issue-card-empty">No issues match this filter</div>';
     return;
   }
 
-  document.getElementById('issues-body').innerHTML = issues.map(issue => {
+  grid.innerHTML = issues.map(issue => {
     const claudeTriaged = state.issueClaudeStatus[issue.number];
     const claudeHtml = claudeTriaged
       ? '<span class="claude-badge claude-triaged"><span class="claude-icon">R</span> Triaged</span>'
-      : '<span style="color:var(--text-muted)">\u2014</span>';
+      : '';
 
-    return `<tr>
-      <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">#${issue.number}</a></td>
-      <td><a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">${esc(issue.title)}</a></td>
-      <td><div class="author-cell">
+    return `<div class="issue-card">
+      <div class="issue-card-header">
+        <div class="issue-card-title">
+          <a href="https://github.com/${repo}/issues/${issue.number}" target="_blank">${esc(issue.title)}</a>
+        </div>
+        <span class="issue-card-number">#${issue.number}</span>
+      </div>
+      <div class="issue-card-author">
         <img class="avatar" src="${issue.user.avatar_url}&s=40" alt="" />
         <a href="https://github.com/${issue.user.login}" target="_blank">${esc(issue.user.login)}</a>
-      </div></td>
-      <td>${issue.labels.map(labelPill).join(' ')}</td>
-      <td>${claudeHtml}</td>
-      <td title="${new Date(issue.created_at).toLocaleDateString()}">${timeAgo(issue.created_at)}</td>
-    </tr>`;
+        <span class="issue-card-age" title="${new Date(issue.created_at).toLocaleDateString()}">${timeAgo(issue.created_at)}</span>
+      </div>
+      <div class="issue-card-meta">
+        ${issue.labels.map(labelPill).join(' ')}
+        ${claudeHtml}
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -470,6 +500,7 @@ function renderPRs() {
   else if (state.prFilter === 'changes-requested') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'changes');
   else if (state.prFilter === 'approved') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'approved');
   else if (state.prFilter === 'needs-review') prs = prs.filter(p => state.prReviewStatus[p.number]?.status === 'pending');
+  else if (state.prFilter === 'needs-workflow') prs = prs.filter(p => (state.prPendingWorkflows[p.number] || []).length > 0);
 
   document.getElementById('tab-prs-count').textContent = prs.length;
 
@@ -480,6 +511,7 @@ function renderPRs() {
     { key: 'approved', label: 'Approved' },
     { key: 'changes-requested', label: 'Changes Req.' },
     { key: 'needs-review', label: 'Needs Review' },
+    { key: 'needs-workflow', label: 'Needs Workflow Approval' },
   ];
   document.getElementById('prs-filters').innerHTML = filterDefs.map(f =>
     `<button class="filter-btn ${state.prFilter === f.key ? 'active' : ''}"
@@ -499,11 +531,16 @@ function renderPRs() {
     const review = state.prReviewStatus[pr.number] || { status: 'pending', label: 'Pending' };
 
     const merge = state.prMergeStatus[pr.number] || 'clean';
-    const allChecksPassing = ci.status === 'pass' && claude.status !== 'fail' && merge !== 'conflicts';
+    const pendingWorkflows = state.prPendingWorkflows[pr.number] || [];
+    const checksOk = ci.status === 'pass' && claude.status !== 'fail';
+    const closeToReady = checksOk && (review.status === 'approved' || review.status === 'pending');
+    const isFork = pr.head.repo && pr.head.repo.full_name !== pr.base.repo.full_name;
+    const needsRebaseAndReady = merge === 'behind' && closeToReady && review.status !== 'changes' && !isFork;
+    const needsAttention = pendingWorkflows.length > 0 || needsRebaseAndReady;
+    const readyForAction = checksOk && merge === 'clean' && review.status !== 'changes';
     let cardCls = 'pr-card';
-    if (merge === 'conflicts' || ci.status === 'fail' || claude.status === 'fail') cardCls = 'pr-card has-conflicts';
-    else if (merge === 'behind') cardCls = 'pr-card needs-rebase';
-    else if (ci.status === 'pass') cardCls = 'pr-card checks-pass';
+    if (needsAttention) cardCls += ' flash-yellow';
+    else if (readyForAction) cardCls += ' flash-green';
 
     const ciCls = ci.status === 'pass' ? 'ci-pass' : ci.status === 'fail' ? 'ci-fail' : 'ci-pending';
     const ciIcon = ci.status === 'pass' ? '\u2713' : ci.status === 'fail' ? '\u2717' : ci.status === 'pending' ? '\u25CC' : '';
@@ -530,16 +567,32 @@ function renderPRs() {
         <span class="pr-card-meta-item ${reviewCls}">${review.label}</span>
         ${merge === 'conflicts' ? '<span class="pr-card-meta-item" style="color:var(--red)">! Conflicts</span>' : ''}
         ${merge === 'behind' ? '<span class="pr-card-meta-item" style="color:var(--yellow)">~ Needs rebase</span>' : ''}
+        ${pendingWorkflows.length > 0 ? '<span class="pr-card-meta-item" style="color:var(--orange)">&#9888; Workflow needs approval</span>' : ''}
       </div>
       <div class="pr-card-actions">
+        ${pendingWorkflows.length > 0
+          ? pendingWorkflows.map(w =>
+              `<button class="approve-workflow-btn" id="approve-wf-${w.runId}"
+                onclick="approveWorkflow(${w.runId}, ${pr.number})"
+                title="${esc(w.name)}">&#9654; Approve Workflow</button>`
+            ).join(' ')
+          : ''
+        }
+        ${merge === 'behind'
+          ? pr.head.repo && pr.head.repo.full_name !== pr.base.repo.full_name
+            ? `<button class="rebase-btn" disabled title="Cannot update branch on fork PRs">Update Branch</button>`
+            : `<button class="rebase-btn" id="rebase-btn-${pr.number}"
+                onclick="rebasePR(${pr.number})">Update Branch</button>`
+          : ''
+        }
         ${(review.status === 'approved' || pr.user.login === state.currentUser)
           ? `<button class="merge-btn" id="merge-btn-${pr.number}"
               onclick="mergePR(${pr.number})"
-              ${merge === 'conflicts' ? 'disabled title="Resolve conflicts before merging"' : ''}
+              ${merge !== 'clean' ? 'disabled title="Branch must be up to date and conflict-free"' : ''}
             >Merge</button>`
           : `<button class="approve-btn" id="approve-btn-${pr.number}"
               onclick="approvePR(${pr.number})"
-              ${allChecksPassing ? '' : 'disabled title="Checks must pass before approving"'}
+              ${checksOk ? '' : 'disabled title="Checks must pass before approving"'}
             >Approve</button>`
         }
       </div>
@@ -629,6 +682,56 @@ async function mergePR(prNum) {
   }
 }
 
+async function rebasePR(prNum) {
+  const btn = document.getElementById(`rebase-btn-${prNum}`);
+  if (!btn) return;
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span> Updating';
+
+  try {
+    const resp = await fetch(`/api/prs/${prNum}/update-branch`, { method: 'PUT' });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `${resp.status}`);
+    }
+    state.prMergeStatus[prNum] = 'clean';
+    renderPRs();
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.innerHTML = 'Failed';
+    btn.style.background = 'var(--red)';
+    btn.style.color = '#fff';
+    btn.title = err.message;
+    setTimeout(() => { btn.innerHTML = 'Update Branch'; btn.style.background = ''; btn.style.color = ''; btn.classList.remove('loading'); }, 3000);
+  }
+}
+
+async function approveWorkflow(runId, prNum) {
+  const btn = document.getElementById(`approve-wf-${runId}`);
+  if (!btn) return;
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span> Approving';
+
+  try {
+    const resp = await fetch(`/api/runs/${runId}/approve`, { method: 'POST' });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `${resp.status}`);
+    }
+    // Remove this workflow from pending list
+    const workflows = state.prPendingWorkflows[prNum] || [];
+    state.prPendingWorkflows[prNum] = workflows.filter(w => w.runId !== runId);
+    if (state.prPendingWorkflows[prNum].length === 0) delete state.prPendingWorkflows[prNum];
+    renderPRs();
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.innerHTML = 'Failed';
+    btn.style.background = 'var(--red)';
+    btn.title = err.message;
+    setTimeout(() => { btn.innerHTML = '&#9654; Approve Workflow'; btn.style.background = ''; btn.classList.remove('loading'); }, 3000);
+  }
+}
+
 // ---------- Tabs & Filters ----------
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -653,6 +756,7 @@ function applyData(data) {
   state.prCIStatus = data.prCIStatus || {};
   state.prReviewStatus = data.prReviewStatus || {};
   state.prMergeStatus = data.prMergeStatus || {};
+  state.prPendingWorkflows = data.prPendingWorkflows || {};
   state.repo = data.repo || '';
   state.currentUser = data.currentUser || '';
   renderAll();

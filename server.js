@@ -196,6 +196,28 @@ async function fetchAllData() {
       } catch {}
     }));
 
+    // Pending workflow approvals
+    const prPendingWorkflows = {};
+    try {
+      const runs = await ghFetch('/actions/runs?status=action_required&per_page=100').then(d => d.workflow_runs || []);
+      for (const run of runs) {
+        // Match run to a PR via head branch + pull_requests field
+        const prNums = (run.pull_requests || []).map(p => p.number);
+        if (prNums.length === 0) {
+          // Try to match by head branch against open PRs
+          const match = prs.find(p => p.head.sha === run.head_sha || p.head.ref === run.head_branch);
+          if (match) prNums.push(match.number);
+        }
+        for (const num of prNums) {
+          if (!prPendingWorkflows[num]) prPendingWorkflows[num] = [];
+          prPendingWorkflows[num].push({ runId: run.id, name: run.name, url: run.html_url });
+        }
+      }
+      console.log(`[refresh] Found ${Object.keys(prPendingWorkflows).length} PRs with pending workflow approvals`);
+    } catch (err) {
+      console.error('[refresh] Failed to fetch pending workflows:', err.message);
+    }
+
     // Activity feed
     const activity = [];
 
@@ -280,6 +302,7 @@ async function fetchAllData() {
       prCIStatus,
       prReviewStatus,
       prMergeStatus,
+      prPendingWorkflows,
       activity: dedupedActivity,
       repo: GITHUB_REPO,
       currentUser: authenticatedUser,
@@ -362,6 +385,52 @@ app.post('/api/prs/:number/approve', async (req, res) => {
     }
     const data = await resp.json();
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update a PR branch (rebase onto base)
+app.put('/api/prs/:number/update-branch', async (req, res) => {
+  try {
+    const prNum = req.params.number;
+    const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/pulls/${prNum}/update-branch`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      return res.status(resp.status).json({ error: err.message || `GitHub ${resp.status}` });
+    }
+    const data = await resp.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Approve a pending workflow run
+app.post('/api/runs/:runId/approve', async (req, res) => {
+  try {
+    const runId = req.params.runId;
+    const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/runs/${runId}/approve`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      return res.status(resp.status).json({ error: err.message || `GitHub ${resp.status}` });
+    }
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
